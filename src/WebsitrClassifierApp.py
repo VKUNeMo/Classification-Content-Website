@@ -45,7 +45,7 @@ class WebsiteClassifierApp:
             with col1:
                 summarize = st.checkbox("Tóm tắt nội dung trước khi phân loại", value=True)
             with col2:
-                show_content = st.checkbox("Hiển thị nội dung website", value=False)
+                show_content = st.checkbox("Hiển thị nội dung website", value=True)
             
             if st.button("Phân loại"):
                 if not url:

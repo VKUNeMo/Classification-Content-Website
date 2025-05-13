@@ -17,7 +17,7 @@ class WebsiteClassifier:
         self.model.to(self.device)
         
         # Định nghĩa các nhãn phân loại (thay đổi theo mô hình cụ thể)
-        self.labels = ["Tin tức", "Nội dung người lớn", "Cờ bạc","Vay tín dụng","Đầu tư tài chính","E-commerce","Tổ chức", "Chưa xác định"]
+        self.labels = ["Tin tức", "Nội dung người lớn", "Cờ bạc","Vay tín dụng","Đầu tư tài chính","Tổ chức nhà nước","E-commerce", "Chưa xác định"]
         
     def classify(self, text):
         """
