@@ -4,7 +4,7 @@ import torch
 class WebsiteClassifier:
     """Lớp phân loại website dựa trên nội dung"""
     
-    def __init__(self, model_name="distilbert-base-uncased-finetuned-sst-2-english"):
+    def __init__(self, model_name="phunganhsang/web-content-sumary-cls"):
         """
         Khởi tạo mô hình phân loại
         
@@ -29,7 +29,7 @@ class WebsiteClassifier:
         Returns:
             dict: Kết quả phân loại với điểm số cho từng nhãn
         """
-        # Tạo pipeline phân loại
+        # Tạo pipeline phân loại với giới hạn max_length rõ ràng
         classifier = pipeline(
             "text-classification", 
             model=self.model, 
@@ -37,23 +37,35 @@ class WebsiteClassifier:
             device=0 if self.device == "cuda" else -1
         )
         
-        # Cắt văn bản thành các đoạn để tránh vượt quá giới hạn độ dài
-        max_length = self.tokenizer.model_max_length
-        chunks = [text[i:i+max_length] for i in range(0, len(text), max_length)]
+        # Xác định độ dài tối đa an toàn 
+        max_length = min(self.tokenizer.model_max_length, 256)
         
-        # Phân loại từng đoạn
-        results = []
-        for chunk in chunks[:5]:  # Giới hạn số đoạn để tránh tốn thời gian
-            result = classifier(chunk)
-            results.append(result[0])
-        
-        # Trả về kết hợp các kết quả (ví dụ lấy phân loại có điểm cao nhất)
-        if results:
-            # Chuyển đổi kết quả tùy theo mô hình
+        # Đảm bảo sử dụng văn bản với độ dài phù hợp
+        # Chú ý: Cắt text bằng tokenizer để đảm bảo số tokens không vượt quá giới hạn
+        encoded = self.tokenizer(text, truncation=True, max_length=max_length)
+        truncated_text = self.tokenizer.decode(encoded['input_ids'], skip_special_tokens=True)
+        print(f"Truncated text: {truncated_text}")
+        try:
+            # Phân loại văn bản với max_length được chỉ định rõ ràng
+            result = classifier(truncated_text, truncation=True, max_length=max_length)[0]
+            
+            # Chuyển đổi kết quả thành định dạng phù hợp
             scores = {}
             for i, label in enumerate(self.labels):
-                scores[label] = sum(result["score"] for result in results if result["label"] == f"LABEL_{i}") / len(results)
+                # Kiểm tra xem label có đúng định dạng không
+                expected_label = f"LABEL_{i}"
+                if result["label"] == expected_label:
+                    scores[label] = result["score"]
+                else:
+                    # Tìm label chính xác trong kết quả nếu có
+                    matching_labels = [r for r in result if isinstance(r, dict) and r.get("label") == expected_label]
+                    if matching_labels:
+                        scores[label] = matching_labels[0]["score"]
+                    else:
+                        scores[label] = 0.0
             
             return scores
-        else:
+        except Exception as e:
+            print(f"Lỗi trong quá trình phân loại: {e}")
+            # Trả về điểm số 0 cho tất cả nhãn nếu có lỗi
             return {label: 0.0 for label in self.labels}

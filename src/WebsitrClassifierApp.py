@@ -64,7 +64,7 @@ class WebsiteClassifierApp:
                         # Tóm tắt nội dung nếu cần
                         if summarize:
                             with st.spinner("Đang tóm tắt nội dung..."):
-                                summary = self.summarizer.summarize(content)
+                                summary = self.summarizer.summarize(content, top_n=8)
                                 st.success("Đã tóm tắt nội dung thành công!")
                                 
                                 if show_content:
@@ -118,4 +118,53 @@ class WebsiteClassifierApp:
             2. Chọn tùy chọn tóm tắt nội dung nếu muốn.
             3. Nhấn nút "Phân loại" để bắt đầu quá trình.
             4. Xem kết quả phân loại website.
+            """)
+            
+            st.subheader("Mô tả về label")
+            st.write("""
+            1. Báo chí, tin tức:
+Các trang báo, tạp chí điện tử, kênh truyền thông đưa tin tức, phân tích thời sự, chính trị, xã hội, kinh tế, giải trí,...
+- Ví dụ: VnExpress, VietnamNet, BBC, Dân Trí
+- Từ khóa gợi ý: “tin mới nhất”, “bản tin”, “phóng sự”, “phân tích thời sự”, “truyền hình trực tuyến”
+- Không bao gồm blog cá nhân hoặc forum tự do
+
+2. 18+, shop tình dục, web phim người lớn:
+Trang có nội dung nhạy cảm, người lớn, khiêu dâm, hoặc bán sản phẩm phục vụ tình dục.
+- Ví dụ: phim18.vip, shopdochoisex.vn
+- Từ khóa: “phim người lớn”, “gợi cảm”, “đồ chơi tình dục”, “bao cao su”, “sex toy”, “18+”, “video nóng”, “gái xinh”
+- Không áp dụng với nội dung tình cảm thuần túy hoặc y học
+
+3. Cờ bạc, bóng đá, xổ số, lô đề:
+Website có nội dung liên quan đến cá cược thể thao, xổ số, đánh bài, lô đề, tài xỉu,...
+- Ví dụ: 789bet, xosomienbac.net, kubet
+- Từ khóa: “soi kèo”, “tỷ lệ cược”, “xổ số hôm nay”, “nhà cái uy tín”, “chơi lô đề”, “cược bóng đá”, “nổ hũ”, “casino online”
+- Không áp dụng với tin tức phân tích thể thao thuần túy không có yếu tố cá độ (=> chuyển về nhãn 1)
+
+4. Vay tín dụng:
+Trang cho vay ngân hàng vay tiền mặt, ứng tiền online, tín dụng cá nhân hoặc tài chính tiêu dùng.
+- Ví dụ: doctiennhanh.vn, vaytienngay.vn
+- Từ khóa: “vay tiền nhanh”, “duyệt vay 15 phút”, “không cần thế chấp”, “lãi suất thấp”, “vay online”
+
+5. Đầu tư tài chính, tiền ảo:
+Trang cung cấp thông tin, dịch vụ hoặc quảng bá về đầu tư tài chính, tiền mã hóa, cổ phiếu, mô hình tài chính đa cấp.
+- Ví dụ: binance.com, sanforex.com, bitcoinvietnam.news
+- Từ khóa: “đầu tư tài chính”, “cổ phiếu”, “mở tài khoản sàn”, “tiền ảo”, “crypto”, “coin”, “blockchain”, “Forex”, “P2P lending”
+
+6. Tổ chức nhà nước, giáo dục, y tế, hành chính:
+Website của cơ quan nhà nước, bệnh viện, trường học, tổ chức hành chính hoặc tổ chức công cộng phi lợi nhuận.
+- Ví dụ: moet.gov.vn, hanoi.gov.vn, benhvienbachmai.vn
+- Từ khóa: “UBND”, “sở y tế”, “trường đại học”, “bệnh viện”, “chính phủ”, “hành chính công”, “thủ tục hành chính”
+- Không áp dụng với tin tức có đề cập đến chính phủ (=> chuyển về nhãn 1)
+
+7. E-commerce, shop hợp pháp:
+Trang thương mại điện tử hoặc cửa hàng online bán các sản phẩm thông thường, hợp pháp theo luật Việt Nam.
+- Ví dụ: shopee.vn, tiki.vn, thegioididong.com
+- Từ khóa: “giỏ hàng”, “sản phẩm khuyến mãi”, “đặt mua ngay”, “ship COD”, “giao hàng tận nơi”, “chính sách đổi trả”
+- Không áp dụng với các shop chứa sản phẩm cấm hoặc nhạy cảm (chuyển về nhãn 2)
+
+8. Còn lại:
+Các trang không thuộc bất kỳ loại nào bên trên.
+- Ví dụ: blog cá nhân, forum công nghệ, portfolio cá nhân, trang kỹ thuật chuyên ngành, trang lỗi 404
+- Từ khóa: “diễn đàn”, “chia sẻ kinh nghiệm”, “tự học lập trình”, “blog du lịch”, “github page”
+- Không chọn nhãn này nếu nội dung có thể phù hợp rõ ràng với 1–7
             """)

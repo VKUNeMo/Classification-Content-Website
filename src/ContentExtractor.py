@@ -12,7 +12,7 @@ class ContentExtractor:
     
     def extract_content(self, url):
         """
-        Trích xuất nội dung từ URL website
+        Trích xuất nội dung từ URL website với encoding UTF-8
         
         Args:
             url (str): URL của website cần trích xuất
@@ -23,19 +23,17 @@ class ContentExtractor:
         try:
             response = requests.get(url, headers=self.headers, timeout=10)
             response.raise_for_status()
-            
+
+            # Đảm bảo mã hóa là UTF-8
+            response.encoding = 'utf-8'
+
             soup = BeautifulSoup(response.text, 'html.parser')
             
-            # Loại bỏ các thẻ không liên quan
+            # Loại bỏ các thẻ không cần thiết
             for tag in soup(['script', 'style', 'header', 'footer', 'nav']):
                 tag.decompose()
             
-            # Lấy văn bản từ thẻ body
-            text = soup.get_text(separator=' ', strip=True)
-            
-            # Xử lý văn bản
-            text = re.sub(r'\s+', ' ', text)  # Loại bỏ khoảng trắng thừa
-            text = re.sub(r'\n+', ' ', text)  # Loại bỏ xuống dòng
+            text = soup.get_text(separator='\n', strip=True)
             
             return text
         except Exception as e:
